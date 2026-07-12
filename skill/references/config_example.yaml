@@ -1,0 +1,58 @@
+# Code Commenter 配置文件示例
+
+# API 配置
+api:
+  provider: deepseek  # 支持: deepseek, openai, azure
+  model: deepseek-chat
+  temperature: 0.3
+  max_tokens: 8000
+
+# 默认设置
+defaults:
+  style: google  # google / jsdoc / javadoc
+  language: auto  # auto 或指定语言
+  translate_to_en: false
+
+# 语言特定配置
+languages:
+  python:
+    style: google
+    comment_format: docstring
+  javascript:
+    style: jsdoc
+    comment_format: block
+  typescript:
+    style: jsdoc
+    comment_format: block
+  java:
+    style: javadoc
+    comment_format: block
+  c:
+    style: doxygen
+    comment_format: block
+  cpp:
+    style: doxygen
+    comment_format: block
+  go:
+    style: godoc
+    comment_format: block
+
+# 批量处理配置
+batch:
+  extensions:
+    - .py
+    - .js
+    - .java
+    - .c
+    - .cpp
+    - .go
+    - .ts
+    - .rs
+    - .cs
+  output_dir: ./output
+  preserve_structure: true
+
+# 输出格式
+output:
+  format: code_only  # code_only / markdown / diff
+  preserve_original: false
