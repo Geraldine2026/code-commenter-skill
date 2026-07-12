@@ -130,6 +130,7 @@ python scripts/comment_generator.py --file tests/sample_code/python_sample.py --
 
 **说明：** 三个参数可自由组合，需在本地终端手动运行验证。
 
+
 ## 测试结论
 
 所有测试用例均通过，Skill 功能完整可用：
@@ -138,6 +139,7 @@ python scripts/comment_generator.py --file tests/sample_code/python_sample.py --
 - ✅ 直接输入代码
 - ✅ 批量处理目录
 - ✅ 注释质量符合预期
+
 - ✅ Markdown 格式输出
 - ✅ 统计信息显示
 - ⏭ 质量评分（需手动验证）

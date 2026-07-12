@@ -54,6 +54,7 @@ python scripts/comment_generator.py --batch ./src --output-dir ./output
 python scripts/comment_generator.py --file code.js --style jsdoc
 ```
 
+
 ## 扩展功能
 
 ### 输出 Markdown 格式

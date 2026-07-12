@@ -208,6 +208,7 @@ class CodeCommenter:
             "results": results
         }
 
+
     def quality_score(self, code: str, language: str) -> dict:
         """调用 AI 对注释质量进行评分"""
         prompt = f"""你是一位代码审查专家，请对以下 {language} 代码的注释质量进行评分（1-10分）。
@@ -274,12 +275,14 @@ def main():
     parser.add_argument("--style", default="google", help="注释风格（默认 google）")
     parser.add_argument("--translate-to-en", action="store_true", help="生成英文注释")
     parser.add_argument("--output", help="输出文件路径（单文件模式）")
+
     parser.add_argument("--format", choices=["code", "markdown"], default="code",
                         help="输出格式：code（纯代码）或 markdown（含代码块）")
     parser.add_argument("--stats", action="store_true",
                         help="显示代码统计信息（行数、注释覆盖率等）")
     parser.add_argument("--quality-score", action="store_true",
                         help="对生成的注释进行质量评分（1-10分）")
+
     
     args = parser.parse_args()
     
@@ -308,7 +311,9 @@ def main():
     # 单文件模式
     if args.file:
         result = commenter.process_file(args.file, args.style, args.translate_to_en)
+
         language = args.language or commenter.detect_language(result)
+
     else:
         language = args.language or commenter.detect_language(args.code)
         result = commenter.generate_comments(args.code, language, args.style, args.translate_to_en)
@@ -319,6 +324,7 @@ def main():
             f.write(result)
         print(f"✅ 已保存到: {args.output}")
     else:
+
         if args.format == "markdown":
             print(f"```{language or 'python'}")
             print(result)
@@ -393,6 +399,9 @@ def print_quality_score(score_result: dict):
     if summary:
         print(f"💡 评语：{summary}")
     print("=" * 50)
+
+        print(result)
+
 
 
 if __name__ == "__main__":

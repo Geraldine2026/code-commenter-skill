@@ -40,6 +40,7 @@ inputs:
     required: false
     default: false
     description: 是否对注释进行质量评分
+
 ---
 
 # Code Commenter
@@ -77,9 +78,11 @@ This skill should be used when:
 | `--code` | 直接输入代码字符串，为代码片段生成注释 | `--code "def foo(): pass"` |
 | `--style` | 指定注释风格，支持 `google`、`jsdoc`、`javadoc` | `--style jsdoc` |
 | `--translate-to-en` | 将生成的注释翻译为英文 | `--translate-to-en` |
+
 | `--format` | 输出格式，可选 `code` 或 `markdown` | `--format markdown` |
 | `--stats` | 显示代码统计信息（行数、注释覆盖率等） | `--stats` |
 | `--quality-score` | 对生成的注释进行质量评分（1-10分） | `--quality-score` |
+
 
 ### Comment Styles
 
@@ -112,6 +115,7 @@ This skill should be used when:
    - 按照 JavaDoc 风格生成注释
    - 输出带注释的代码
 
+
 ### 输出 Markdown 格式
 
 ```bash
@@ -143,6 +147,7 @@ python scripts/comment_generator.py --file ./src/main.py --format markdown --sta
 ```
 
 多个参数可自由组合，获得 Markdown 格式输出、统计报告和质量评分的完整分析结果。
+
 
 ## Comment Generation Guidelines
 
