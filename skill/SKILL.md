@@ -2,6 +2,44 @@
 name: code-commenter
 description: 自动为代码生成智能注释，支持多语言。当用户需要为代码添加注释、生成文档注释、或对已有代码进行注释补全时，使用此 skill。支持通过文件路径或直接粘贴代码进行注释生成。
 version: 1.0.0
+inputs:
+  - name: file_path
+    type: string
+    required: false
+    description: 代码文件路径
+  - name: code_text
+    type: string
+    required: false
+    description: 直接粘贴的代码
+  - name: language
+    type: string
+    required: false
+    description: 编程语言（自动检测可选）
+  - name: comment_style
+    type: string
+    required: false
+    default: google
+    description: 注释风格（google/java/docstring等）
+  - name: translate_to_en
+    type: boolean
+    required: false
+    default: false
+    description: 是否生成英文注释
+  - name: format
+    type: string
+    required: false
+    default: code
+    description: 输出格式，可选 code 或 markdown
+  - name: stats
+    type: boolean
+    required: false
+    default: false
+    description: 是否显示代码统计信息
+  - name: quality_score
+    type: boolean
+    required: false
+    default: false
+    description: 是否对注释进行质量评分
 ---
 
 # Code Commenter
@@ -39,6 +77,9 @@ This skill should be used when:
 | `--code` | 直接输入代码字符串，为代码片段生成注释 | `--code "def foo(): pass"` |
 | `--style` | 指定注释风格，支持 `google`、`jsdoc`、`javadoc` | `--style jsdoc` |
 | `--translate-to-en` | 将生成的注释翻译为英文 | `--translate-to-en` |
+| `--format` | 输出格式，可选 `code` 或 `markdown` | `--format markdown` |
+| `--stats` | 显示代码统计信息（行数、注释覆盖率等） | `--stats` |
+| `--quality-score` | 对生成的注释进行质量评分（1-10分） | `--quality-score` |
 
 ### Comment Styles
 
@@ -70,6 +111,38 @@ This skill should be used when:
    - 解析粘贴的代码
    - 按照 JavaDoc 风格生成注释
    - 输出带注释的代码
+
+### 输出 Markdown 格式
+
+```bash
+python scripts/comment_generator.py --file ./src/main.py --format markdown
+```
+
+使用 `--format markdown` 将输出包裹在 Markdown 代码块中，方便直接粘贴到文档。
+
+### 显示统计信息
+
+```bash
+python scripts/comment_generator.py --file ./src/main.py --stats
+```
+
+使用 `--stats` 显示代码统计报告，包括总行数、注释行数、注释覆盖率和函数/类数量。
+
+### 注释质量评分
+
+```bash
+python scripts/comment_generator.py --file ./src/main.py --quality-score
+```
+
+使用 `--quality-score` 对生成的注释进行 AI 质量评分（1-10分），从完整性、清晰度、专业性和实用性四个维度评估。
+
+### 组合使用
+
+```bash
+python scripts/comment_generator.py --file ./src/main.py --format markdown --stats --quality-score
+```
+
+多个参数可自由组合，获得 Markdown 格式输出、统计报告和质量评分的完整分析结果。
 
 ## Comment Generation Guidelines
 

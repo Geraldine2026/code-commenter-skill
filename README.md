@@ -54,6 +54,32 @@ python scripts/comment_generator.py --batch ./src --output-dir ./output
 python scripts/comment_generator.py --file code.js --style jsdoc
 ```
 
+## 扩展功能
+
+### 输出 Markdown 格式
+
+```bash
+python scripts/comment_generator.py --file test.py --format markdown
+```
+
+### 显示统计信息
+
+```bash
+python scripts/comment_generator.py --file test.py --stats
+```
+
+### 注释质量评分
+
+```bash
+python scripts/comment_generator.py --file test.py --quality-score
+```
+
+### 组合使用所有扩展功能
+
+```bash
+python scripts/comment_generator.py --file test.py --format markdown --stats --quality-score
+```
+
 ## 目录结构
 
 ```text

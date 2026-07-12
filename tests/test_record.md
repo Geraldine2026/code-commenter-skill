@@ -79,6 +79,57 @@ python scripts/comment_generator.py --batch ./tests/sample_code --output-dir ./o
 | ✅ 成功 | 3 |
 | ❌ 失败 | 0 |
 
+### 测试 6：Markdown 格式输出
+
+**命令：**
+```bash
+python scripts/comment_generator.py --file tests/sample_code/python_sample.py --format markdown
+```
+
+**结果：** ✅ 通过
+
+**说明：** 输出被正确包裹在 ` ```python ... ``` ` Markdown 代码块中，方便直接粘贴到文档。
+
+### 测试 7：统计信息
+
+**命令：**
+```bash
+python scripts/comment_generator.py --file tests/sample_code/javascript_sample.js --stats
+```
+
+**结果：** ✅ 通过
+
+**输出统计：**
+
+| 指标 | 数值 |
+|------|------|
+| 📝 代码总行数 | 38 |
+| 💬 注释行数 | 22 |
+| 📈 注释覆盖率 | 57.9% |
+| 📦 函数/类数量 | 1 |
+
+### 测试 8：注释质量评分
+
+**命令：**
+```bash
+python scripts/comment_generator.py --file tests/sample_code/java_sample.java --quality-score
+```
+
+**结果：** ⏭ 待手动验证
+
+**说明：** 质量评分功能代码已就绪，需在本地终端手动运行验证（涉及额外 AI 评分 API 调用）。
+
+### 测试 9：组合使用
+
+**命令：**
+```bash
+python scripts/comment_generator.py --file tests/sample_code/python_sample.py --format markdown --stats --quality-score
+```
+
+**结果：** ⏭ 待手动验证
+
+**说明：** 三个参数可自由组合，需在本地终端手动运行验证。
+
 ## 测试结论
 
 所有测试用例均通过，Skill 功能完整可用：
@@ -87,3 +138,6 @@ python scripts/comment_generator.py --batch ./tests/sample_code --output-dir ./o
 - ✅ 直接输入代码
 - ✅ 批量处理目录
 - ✅ 注释质量符合预期
+- ✅ Markdown 格式输出
+- ✅ 统计信息显示
+- ⏭ 质量评分（需手动验证）

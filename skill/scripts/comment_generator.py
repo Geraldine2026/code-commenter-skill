@@ -208,6 +208,61 @@ class CodeCommenter:
             "results": results
         }
 
+    def quality_score(self, code: str, language: str) -> dict:
+        """调用 AI 对注释质量进行评分"""
+        prompt = f"""你是一位代码审查专家，请对以下 {language} 代码的注释质量进行评分（1-10分）。
+
+评分维度：
+1. 完整性：是否涵盖了函数用途、参数、返回值
+2. 清晰度：注释是否易于理解
+3. 专业性：术语使用是否准确
+4. 实用性：是否包含边界条件或使用示例
+
+代码：
+{code}
+
+请以 JSON 格式输出：
+{{"score": 8.5, "dimensions": {{"completeness": 9, "clarity": 8, "professionalism": 9, "practicality": 8}}, "summary": "优点：... 建议：..."}}
+
+只输出 JSON："""
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "你是代码审查专家，请以 JSON 格式输出评分结果。"},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.1,
+                max_tokens=1000
+            )
+            import json
+            result = json.loads(response.choices[0].message.content)
+            return result
+        except Exception as e:
+            return {'score': 0, 'error': str(e)}
+
+    def generate_stats(self, original_code: str, commented_code: str) -> dict:
+        """分析代码统计信息"""
+        original_lines = original_code.split('\n') if original_code else []
+        commented_lines = commented_code.split('\n') if commented_code else []
+        
+        total_lines = len(commented_lines)
+        comment_lines = sum(1 for line in commented_lines 
+                          if line.strip().startswith(('#', '//', '/*', '*', '"""', "'''"))
+                            or line.strip().startswith('*'))
+        # 统计函数/类定义
+        import re
+        functions = len(re.findall(r'\bdef\s+\w+|\bfunction\s+\w+|\bclass\s+\w+', original_code))
+        coverage = round(comment_lines / total_lines * 100, 1) if total_lines > 0 else 0
+        
+        return {
+            'total_lines': total_lines,
+            'comment_lines': comment_lines,
+            'coverage': coverage,
+            'functions': functions
+        }
+
 
 def main():
     parser = argparse.ArgumentParser(description="代码注释自动生成器")
@@ -219,6 +274,12 @@ def main():
     parser.add_argument("--style", default="google", help="注释风格（默认 google）")
     parser.add_argument("--translate-to-en", action="store_true", help="生成英文注释")
     parser.add_argument("--output", help="输出文件路径（单文件模式）")
+    parser.add_argument("--format", choices=["code", "markdown"], default="code",
+                        help="输出格式：code（纯代码）或 markdown（含代码块）")
+    parser.add_argument("--stats", action="store_true",
+                        help="显示代码统计信息（行数、注释覆盖率等）")
+    parser.add_argument("--quality-score", action="store_true",
+                        help="对生成的注释进行质量评分（1-10分）")
     
     args = parser.parse_args()
     
@@ -247,6 +308,7 @@ def main():
     # 单文件模式
     if args.file:
         result = commenter.process_file(args.file, args.style, args.translate_to_en)
+        language = args.language or commenter.detect_language(result)
     else:
         language = args.language or commenter.detect_language(args.code)
         result = commenter.generate_comments(args.code, language, args.style, args.translate_to_en)
@@ -257,7 +319,80 @@ def main():
             f.write(result)
         print(f"✅ 已保存到: {args.output}")
     else:
-        print(result)
+        if args.format == "markdown":
+            print(f"```{language or 'python'}")
+            print(result)
+            print("```")
+        else:
+            print(result)
+    
+    # 统计信息
+    if args.stats:
+        original_code = args.code or (open(args.file, encoding='utf-8').read() if args.file else "")
+        stats = commenter.generate_stats(original_code, result)
+        print_stats_result(stats)
+    
+    # 质量评分
+    if args.quality_score:
+        score_result = commenter.quality_score(result, language)
+        print_quality_score(score_result)
+
+
+def print_stats(code: str, language: str, commenter: CodeCommenter):
+    """打印统计信息"""
+    stats = commenter.generate_stats(code, code)  # 简化版，实际应传 original 和 commented
+    
+    print("\n" + "=" * 50)
+    print("📊 代码分析报告")
+    print("=" * 50)
+    print(f"📁 文件语言：{language or '未知'}")
+    print(f"📝 代码总行数：{stats.get('total_lines', 0)}")
+    print(f"💬 注释行数：{stats.get('comment_lines', 0)}")
+    print(f"📈 注释覆盖率：{stats.get('coverage', 0)}%")
+    print(f"📦 函数/类数量：{stats.get('functions', 0)}")
+    print("=" * 50)
+
+
+def print_stats_result(stats: dict):
+    """格式化输出统计信息"""
+    print("\n" + "=" * 50)
+    print("📊 代码分析报告")
+    print("=" * 50)
+    print(f"📝 代码总行数：{stats.get('total_lines', 0)}")
+    print(f"💬 注释行数：{stats.get('comment_lines', 0)}")
+    print(f"📈 注释覆盖率：{stats.get('coverage', 0)}%")
+    print(f"📦 函数/类数量：{stats.get('functions', 0)}")
+    print("=" * 50)
+
+
+def print_quality_score(score_result: dict):
+    """格式化输出质量评分"""
+    if 'error' in score_result:
+        print(f"\n❌ 质量评分失败: {score_result['error']}")
+        return
+    
+    print("\n" + "=" * 50)
+    print("⭐ 注释质量评分")
+    print("=" * 50)
+    print(f"📊 综合评分：{score_result.get('score', 0)}/10")
+    
+    dimensions = score_result.get('dimensions', {})
+    if dimensions:
+        print("📋 各维度评分：")
+        dim_names = {
+            'completeness': '完整性',
+            'clarity': '清晰度', 
+            'professionalism': '专业性',
+            'practicality': '实用性'
+        }
+        for key, name in dim_names.items():
+            if key in dimensions:
+                print(f"   {name}：{dimensions[key]}/10")
+    
+    summary = score_result.get('summary', '')
+    if summary:
+        print(f"💡 评语：{summary}")
+    print("=" * 50)
 
 
 if __name__ == "__main__":
